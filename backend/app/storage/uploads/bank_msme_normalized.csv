@@ -1,0 +1,25 @@
+date,description,debit,credit,balance
+2024-10-05,Sale - Ravi Textiles,0,0.0,285000
+2024-10-12,Supplier Payment - Cotton Mills,42000,0.0,243000
+2024-10-18,Sale - Mehta Garments,0,0.0,305000
+2024-10-25,Salary October,38000,0.0,267000
+2024-11-03,Sale - Ravi Textiles,0,0.0,358000
+2024-11-10,Supplier Payment - Cotton Mills,45000,0.0,313000
+2024-11-22,Sale - Kumar Traders,0,0.0,387000
+2024-11-29,Salary November,38000,0.0,349000
+2024-12-04,Sale - Ravi Textiles,0,0.0,404000
+2024-12-15,Supplier Payment - Cotton Mills,48000,0.0,356000
+2024-12-20,Sale - Mehta Garments,0,0.0,398000
+2024-12-28,Salary December,38000,0.0,360000
+2025-01-06,Sale - Ravi Textiles,0,0.0,455000
+2025-01-14,Supplier Payment - Thread House,32000,0.0,423000
+2025-01-22,Sale - Kumar Traders,0,0.0,511000
+2025-01-30,Salary January,40000,0.0,471000
+2025-02-05,Sale - Ravi Textiles,0,0.0,549000
+2025-02-12,Supplier Payment - Cotton Mills,50000,0.0,499000
+2025-02-20,Sale - Mehta Garments,0,0.0,564000
+2025-02-27,Salary February,40000,0.0,524000
+2025-03-08,Sale - Ravi Textiles,0,0.0,572000
+2025-03-15,Supplier Payment - Cotton Mills,52000,0.0,520000
+2025-03-22,Sale - Kumar Traders,0,0.0,558000
+2025-03-30,Salary March,40000,0.0,518000

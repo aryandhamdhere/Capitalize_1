@@ -1,0 +1,8 @@
+donor_code,project_code,programme,state,month,category,budget_amount
+D001,P001,Health, Maharashtra,2024-01,Training,500000
+D001,P001,Health, Maharashtra,2024-02,Equipment,300000
+D002,P002,Education,Karnataka,2024-01,Training,400000
+D002,P002,Education,Karnataka,2024-02,Operations,200000
+D003,P003,Agriculture,Gujarat,2024-01,Awareness,250000
+D003,P003,Agriculture,Gujarat,2024-02,Equipment,150000
+D001,P004,Women Empowerment,Rajasthan,2024-01,Workshops,350000

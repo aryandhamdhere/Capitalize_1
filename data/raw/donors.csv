@@ -1,0 +1,4 @@
+donor_code,donor_name,donor_type,preferred_report_template
+D001,UNICEF,International,standard
+D002,Tata Trusts,Corporate,summary
+D003,Bill & Melinda Gates Foundation,International,detailed
