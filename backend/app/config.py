@@ -1,4 +1,7 @@
+from typing import Optional
+
 from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     UPLOAD_DIR: str = "app/storage/uploads"
@@ -10,6 +13,10 @@ class Settings(BaseSettings):
 
     SECRET_KEY: str = "supersecret"
     ALGORITHM: str = "HS256"
+
+    # Google AI — used only from POST /api/dashboard/generate (cached per file)
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.0-flash"
 
     class Config:
         env_file = ".env"
