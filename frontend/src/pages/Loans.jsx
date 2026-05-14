@@ -6,9 +6,13 @@ const Loans = () => {
   const [activeTab, setActiveTab] = useState('All');
   const userScore = 73;
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth <= 1024);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -24,38 +28,65 @@ const Loans = () => {
 
   const unlockedCount = loansData.filter(l => !l.locked).length;
 
+  const loansGridCols = isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)';
+
   return (
-    <div className="flex-col gap-6" style={{ display: 'flex' }}>
-      
-      {/* Top Section: Score Gate Bar */}
-      <div className="card flex items-center justify-between" style={{ padding: '1.5rem 2rem', backgroundColor: 'var(--color-navy)', color: 'white', flexWrap: 'wrap', gap: '1rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '24px' }}>
+
+      {/* Score Gate Bar */}
+      <div className="card" style={{
+        display: 'flex',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        justifyContent: 'space-between',
+        flexDirection: isMobile ? 'column' : 'row',
+        padding: isMobile ? '1rem' : '1.5rem 2rem',
+        backgroundColor: 'var(--color-navy)',
+        color: 'white',
+        gap: '1rem'
+      }}>
         <div>
-          <div className="text-meta" style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '0.25rem' }}>Your Score: {userScore}/100</div>
-          <div className="text-card-title" style={{ fontSize: '18px' }}>You qualify for {unlockedCount} out of {loansData.length} lending products</div>
+          <div className="text-meta" style={{ color: 'rgba(255,255,255,0.7)', marginBottom: '0.25rem' }}>
+            Your Score: {userScore}/100
+          </div>
+          <div className="text-card-title" style={{ fontSize: '18px' }}>
+            You qualify for {unlockedCount} out of {loansData.length} lending products
+          </div>
         </div>
-        <div style={{ width: '100%', maxWidth: '300px' }}>
-          <div className="flex justify-between text-meta mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-            <span>Progress to unlock all</span>
-            <span>{Math.round((unlockedCount/loansData.length)*100)}%</span>
+        <div style={{ width: '100%', maxWidth: isMobile ? '100%' : '300px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }} className="text-meta mb-1">
+            <span style={{ color: 'rgba(255,255,255,0.7)' }}>Progress to unlock all</span>
+            <span style={{ color: 'rgba(255,255,255,0.7)' }}>{Math.round((unlockedCount / loansData.length) * 100)}%</span>
           </div>
           <div style={{ width: '100%', height: '8px', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '4px', overflow: 'hidden' }}>
-            <div className="pillar-bar-fill" style={{ width: `${(unlockedCount/loansData.length)*100}%` }}></div>
+            <div className="pillar-bar-fill" style={{ width: `${(unlockedCount / loansData.length) * 100}%` }}></div>
           </div>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', overflowX: 'auto', whiteSpace: 'nowrap', scrollbarWidth: 'none' }}>
+      {/* Filter Tabs — horizontally scrollable on mobile */}
+      <div className="filter-tabs" style={{
+        display: 'flex',
+        gap: '1rem',
+        borderBottom: '1px solid var(--color-border)',
+        paddingBottom: '0.5rem',
+        overflowX: 'auto',
+        whiteSpace: 'nowrap',
+        scrollbarWidth: 'none',
+        WebkitOverflowScrolling: 'touch'
+      }}>
         {tabs.map(tab => (
-          <button 
+          <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className="text-btn nav-item"
-            style={{ 
-              padding: '0.5rem 0.5rem', 
+            className="filter-tab text-btn nav-item"
+            style={{
+              padding: '0.5rem 0.5rem',
               color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)',
               borderBottom: activeTab === tab ? '2px solid var(--color-primary)' : '2px solid transparent',
-              marginBottom: '-9px'
+              marginBottom: '-9px',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+              minHeight: '44px'
             }}
           >
             {tab}
@@ -64,43 +95,53 @@ const Loans = () => {
       </div>
 
       {/* Loan Cards Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: loansGridCols,
+        gap: isMobile ? '12px' : '20px'
+      }}>
         {filteredLoans.map(loan => (
-          <div 
-            key={loan.id} 
-            className="card flex-col justify-between metric-card" 
-            style={{ 
+          <div
+            key={loan.id}
+            className="card metric-card"
+            style={{
               display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
               border: loan.locked ? '1px solid var(--color-border)' : '1px solid var(--color-primary)',
               opacity: loan.locked ? 0.7 : 1,
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'visible'
             }}
           >
             {/* Badge */}
-            <div style={{ position: 'absolute', top: '12px', right: '12px', maxWidth: 'calc(100% - 24px)', zIndex: 10 }}>
+            <div className="locked-badge" style={{ position: 'absolute', top: '12px', right: '12px', maxWidth: 'calc(100% - 24px)', zIndex: 2 }}>
               {loan.locked ? (
-                <span className="badge badge-danger text-badge flex items-center gap-1"><Lock size={12} flexShrink={0} /> <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Score {loan.reqScore}+ Required</span></span>
+                <span className="badge badge-danger text-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Lock size={12} style={{ flexShrink: 0 }} />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Score {loan.reqScore}+ Required</span>
+                </span>
               ) : (
-                <span className="badge badge-success text-badge flex items-center gap-1"><CheckCircle2 size={12} /> Eligible</span>
+                <span className="badge badge-success text-badge" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <CheckCircle2 size={12} /> Eligible
+                </span>
               )}
             </div>
 
             <div style={{ marginTop: loan.locked ? '24px' : '0' }}>
               <div className="text-meta mb-1">{loan.provider}</div>
               <h3 className="text-card-title mb-4" style={{ fontSize: '18px' }}>{loan.name}</h3>
-              
-              <div className="flex-col gap-2 mb-6" style={{ display: 'flex' }}>
-                <div className="flex justify-between text-body">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }} className="text-body">
                   <span className="text-meta">Amount</span>
                   <span style={{ fontWeight: '500' }}>{loan.amount}</span>
                 </div>
-                <div className="flex justify-between text-body">
+                <div style={{ display: 'flex', justifyContent: 'space-between' }} className="text-body">
                   <span className="text-meta">Interest Rate</span>
                   <span style={{ fontWeight: '500' }}>{loan.rate}</span>
                 </div>
                 {loan.details && (
-                  <div className="flex justify-between text-body">
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }} className="text-body">
                     <span className="text-meta">Key Feature</span>
                     <span style={{ fontWeight: '500', textAlign: 'right' }}>{loan.details}</span>
                   </div>
@@ -109,7 +150,7 @@ const Loans = () => {
             </div>
 
             {loan.locked ? (
-              <button className="text-primary text-btn hover:underline text-left" style={{ padding: '0.5rem 0' }}>
+              <button className="text-primary text-btn" style={{ padding: '0.5rem 0', textAlign: 'left' }}>
                 How to unlock →
               </button>
             ) : (
@@ -122,9 +163,15 @@ const Loans = () => {
       </div>
 
       {/* Bottom Banner */}
-      <div className="card" style={{ backgroundColor: 'var(--color-primary-light)', borderColor: 'var(--color-primary)', padding: '1.5rem 2rem', marginTop: '1rem' }}>
-        <div className={`flex ${isMobile ? 'flex-col items-center text-center' : 'items-center'} gap-4`}>
-          <div style={{ padding: '0.75rem', backgroundColor: 'var(--color-primary)', borderRadius: '50%', color: 'white', flexShrink: 0 }}>
+      <div className="card" style={{ backgroundColor: 'var(--color-primary-light)', borderColor: 'var(--color-primary)', padding: isMobile ? '1rem' : '1.5rem 2rem', marginTop: '1rem' }}>
+        <div className="loan-bottom-banner" style={{
+          display: 'flex',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '16px' : '1rem',
+          textAlign: isMobile ? 'center' : 'left'
+        }}>
+          <div style={{ padding: '0.75rem', backgroundColor: 'var(--color-primary)', borderRadius: '50%', color: 'white', flexShrink: 0, alignSelf: isMobile ? 'center' : 'auto' }}>
             <Zap size={24} />
           </div>
           <div>

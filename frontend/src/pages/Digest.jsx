@@ -6,9 +6,13 @@ import AnimatedCounter from '../components/AnimatedCounter';
 
 const Digest = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth <= 1024);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -16,15 +20,9 @@ const Digest = () => {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: {
-      duration: 1000,
-      easing: 'easeInOutQuart',
-    },
+    animation: { duration: 1000, easing: 'easeInOutQuart' },
     plugins: { legend: { display: false } },
-    scales: {
-      y: { display: false },
-      x: { display: false }
-    }
+    scales: { y: { display: false }, x: { display: false } }
   };
 
   const chartDataObj = {
@@ -36,39 +34,52 @@ const Digest = () => {
     }]
   };
 
+  const deltaGridCols = isMobile ? 'repeat(2, 1fr)' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)';
+
   return (
-    <div className="flex-col gap-6" style={{ display: 'flex', maxWidth: '800px', margin: '0 auto' }}>
-      
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '12px' : '24px', maxWidth: '800px', margin: '0 auto' }}>
+
       {/* Header */}
-      <div className="flex items-start justify-between" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="digest-header" style={{
+        display: 'flex',
+        alignItems: isMobile ? 'flex-start' : 'flex-start',
+        justifyContent: 'space-between',
+        flexDirection: isMobile ? 'column' : 'row',
+        flexWrap: 'wrap',
+        gap: isMobile ? '12px' : '1rem'
+      }}>
         <div>
           <h2 className="text-page-title mb-2">Weekly Intelligence Digest</h2>
-          <div className="flex gap-4 text-meta">
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }} className="text-meta">
             <span>Week of 7–13 May 2026</span>
-            <span className="desktop-only">•</span>
-            <span className="desktop-only">Auto-generated every Monday</span>
+            {!isMobile && <span>•</span>}
+            {!isMobile && <span>Auto-generated every Monday</span>}
           </div>
-          <div className="text-meta mobile-only mt-1">Auto-generated every Monday</div>
+          {isMobile && <div className="text-meta" style={{ marginTop: '4px' }}>Auto-generated every Monday</div>}
         </div>
-        <button className="btn-outline text-btn w-full mobile-only mt-2" style={{ width: '100%' }}>
-          <FileDown size={18} /> Download PDF
-        </button>
-        <button className="btn-outline text-btn desktop-only">
+        <button
+          className="btn-outline text-btn download-btn"
+          style={{ width: isMobile ? '100%' : 'auto', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+        >
           <FileDown size={18} /> Download PDF
         </button>
       </div>
 
-      {/* Top Delta Cards */}
-      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-4`}>
-        <DeltaCard label="Net Revenue" value={<AnimatedCounter targetValue={108} prefix="₹" suffix="k" />} trend="+18%" color="var(--color-success)" />
-        <DeltaCard label="Total Expenses" value={<AnimatedCounter targetValue={62.4} prefix="₹" suffix="k" decimals={1} />} trend="+4%" color="var(--color-warning)" />
-        <DeltaCard label="Transactions" value={<AnimatedCounter targetValue={63} />} trend="+7" color="var(--color-primary)" />
-        <DeltaCard label="Score Change" value="+2 pts" trend="71 → 73" color="var(--color-success)" />
+      {/* Delta Cards — 4 col → 2 col */}
+      <div className="digest-delta-grid" style={{
+        display: 'grid',
+        gridTemplateColumns: deltaGridCols,
+        gap: isMobile ? '10px' : '16px'
+      }}>
+        <DeltaCard label="Net Revenue" value={<AnimatedCounter targetValue={108} prefix="₹" suffix="k" />} trend="+18%" color="var(--color-success)" isMobile={isMobile} />
+        <DeltaCard label="Total Expenses" value={<AnimatedCounter targetValue={62.4} prefix="₹" suffix="k" decimals={1} />} trend="+4%" color="var(--color-warning)" isMobile={isMobile} />
+        <DeltaCard label="Transactions" value={<AnimatedCounter targetValue={63} />} trend="+7" color="var(--color-primary)" isMobile={isMobile} />
+        <DeltaCard label="Score Change" value="+2 pts" trend="71 → 73" color="var(--color-success)" isMobile={isMobile} />
       </div>
 
       {/* Main Digest Report */}
-      <div className="card flex-col gap-8" style={{ display: 'flex', padding: isMobile ? '1.5rem 1rem' : '2rem' }}>
-        
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: isMobile ? '1rem' : '2rem' }}>
+
         <ReportSection title="Revenue Highlights" icon={<TrendingUp color="var(--color-success)" />}>
           <ul className="text-body" style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <li><strong style={{ fontWeight: '600' }}>Top Source:</strong> Kumar Retail accounted for 42% of total weekly inflow (₹80,500).</li>
@@ -77,7 +88,7 @@ const Digest = () => {
           </ul>
         </ReportSection>
 
-        <div style={{ height: '1px', backgroundColor: 'var(--color-border)', width: '100%' }}></div>
+        <div style={{ height: '1px', backgroundColor: 'var(--color-border)' }}></div>
 
         <ReportSection title="Expense Analysis" icon={<TrendingDown color="var(--color-warning)" />}>
           <ul className="text-body" style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -87,9 +98,9 @@ const Digest = () => {
           </ul>
         </ReportSection>
 
-        <div style={{ height: '1px', backgroundColor: 'var(--color-border)', width: '100%' }}></div>
+        <div style={{ height: '1px', backgroundColor: 'var(--color-border)' }}></div>
 
-        <div className="flex gap-6" style={{ flexDirection: isMobile ? 'column' : 'row' }}>
+        <div style={{ display: 'flex', gap: '1.5rem', flexDirection: isMobile ? 'column' : 'row' }}>
           <div style={{ flex: 1 }}>
             <ReportSection title="Cash Flow Health" icon={<AlertCircle color="var(--color-primary)" />}>
               <ul className="text-body" style={{ paddingLeft: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -103,7 +114,7 @@ const Digest = () => {
           </div>
         </div>
 
-        <div style={{ height: '1px', backgroundColor: 'var(--color-border)', width: '100%' }}></div>
+        <div style={{ height: '1px', backgroundColor: 'var(--color-border)' }}></div>
 
         <ReportSection title="Credit Score Movement" icon={<CheckCircle2 color="var(--color-success)" />}>
           <p className="text-body mb-2">Your score increased from <strong>71</strong> to <strong>73</strong> (Good Tier).</p>
@@ -111,42 +122,38 @@ const Digest = () => {
             <strong style={{ fontWeight: '600' }}>What changed:</strong> Payment Regularity improved by +3 points after clearing 4 pending invoices on time.
           </div>
         </ReportSection>
-
       </div>
 
       {/* AI Recommendations */}
       <div className="card" style={{ backgroundColor: 'var(--color-navy)', color: 'white', borderColor: 'var(--color-navy)' }}>
-        <h3 className="text-card-title mb-4 flex items-center gap-2">
+        <h3 className="text-card-title mb-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ color: 'var(--color-primary)' }}>✨</span> AI Recommendations for Next Week
         </h3>
-        <div className="flex-col gap-3" style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <RecommendationItem text="Review 'Office Internet' subscription plan for potential overcharges." />
           <RecommendationItem text="Send automated payment reminders to 3 clients with invoices overdue by >5 days." />
           <RecommendationItem text="Keep end-of-month cash balance above ₹2L to maintain Cash Flow Consistency score." />
         </div>
       </div>
 
-      <div className="text-center text-meta mt-4">
+      <div className="text-center text-meta" style={{ marginTop: '1rem' }}>
         This digest was auto-generated by Capitalize AI. Not financial advice.
       </div>
-
     </div>
   );
 };
 
-const DeltaCard = ({ label, value, trend, color }) => (
+const DeltaCard = ({ label, value, trend, color, isMobile }) => (
   <div className="card metric-card" style={{ padding: '1rem' }}>
     <div className="text-meta mb-1">{label}</div>
-    <div className="text-metric" style={{ fontSize: '20px' }}>{value}</div>
-    <div className="text-delta" style={{ color: color, marginTop: '0.25rem' }}>
-      {trend}
-    </div>
+    <div className="delta-value text-metric" style={{ fontSize: isMobile ? '20px' : '20px' }}>{value}</div>
+    <div className="text-delta" style={{ color, marginTop: '0.25rem' }}>{trend}</div>
   </div>
 );
 
 const ReportSection = ({ title, icon, children }) => (
   <div>
-    <h3 className="text-card-title mb-4 flex items-center gap-2">
+    <h3 className="text-card-title mb-4" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
       {icon} {title}
     </h3>
     {children}
@@ -154,7 +161,7 @@ const ReportSection = ({ title, icon, children }) => (
 );
 
 const RecommendationItem = ({ text }) => (
-  <div className="flex items-start gap-3" style={{ padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
     <ArrowRight size={18} color="var(--color-primary)" style={{ marginTop: '2px', flexShrink: 0 }} />
     <span className="text-body" style={{ color: 'rgba(255,255,255,0.9)' }}>{text}</span>
   </div>

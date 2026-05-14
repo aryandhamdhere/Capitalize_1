@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { sharmaData } from "../data/sampleData";
@@ -111,6 +111,17 @@ function QualityBadge({ confidence, months, transactions }) {
 
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function CreditScore() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth <= 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const navigate = useNavigate();
   const [liveScore, setLiveScore]       = useState(null);
   const [loading, setLoading]           = useState(false);
@@ -209,7 +220,7 @@ export default function CreditScore() {
         )}
 
         {/* Score Overview */}
-        <div className="grid-2">
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '24px' }}>
 
           {/* Left — Score */}
           <div className="card" style={{
@@ -296,7 +307,7 @@ export default function CreditScore() {
         {/* How to Improve */}
         <div className="card">
           <div className="card-title">🚀 How to Improve Your Score</div>
-          <div className="grid-3">
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: isMobile ? '12px' : '20px' }}>
             {[
               {
                 icon: "📅",
